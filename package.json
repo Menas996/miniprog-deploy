@@ -1,0 +1,12 @@
+{
+  "name": "miniprog-deploy",
+  "version": "0.1.0",
+  "description": "a miniprogram auto-deploy tool",
+  "main": "index.js",
+  "scripts": {
+     "deploy":"node ./src/deploy.js"
+  },
+  "author": "menas",
+  "license": "ISC",
+  "keywords":["miniprogram","wechat"]
+}
