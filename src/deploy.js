@@ -1,21 +1,31 @@
+#!/usr/bin/env node
 const ci = require("miniprogram-ci");
-const { getUpdateMessage } = require("./utils");
+const { paramHandler,getDeployConfig } = require("./utils");
 
 (async () => {
-    const { isSuccess, result } = await getUpdateMessage();
-    if(!isSuccess) return;
-    const { version, desc } = result;
+    const deployConfig = getDeployConfig();
+    if(deployConfig == null) return;
+    const workers = paramHandler();
+    if(workers == null) return;
+    const { 
+            version,
+            desc,
+            robot,
+            appid,
+            privateKeyPath,
+            projectPath 
+    } = workers;
+  
     const project = new ci.Project({
-        appid: 'wx357664b7c2a9fbd5',
+        appid,privateKeyPath,projectPath,
         type: 'miniProgram',
-        projectPath: '..',
-        privateKeyPath: 'the/path/to/privatekey',
         ignores: ['node_modules/**/*'],
     })
 
     const uploadResult = await ci.upload({
         project,
         version,
+        robot,
         desc,
         setting: {
             es6: true,
@@ -24,7 +34,7 @@ const { getUpdateMessage } = require("./utils");
             minifyWXML: true,
             minifyWXSS: true
         },
-        onProgressUpdate: console.log,
+        onProgressUpdate: console.log
     })
-    console.log(uploadResult)
+    console.log(uploadResult);
 })()
