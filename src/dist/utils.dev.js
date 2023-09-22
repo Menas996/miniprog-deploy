@@ -32,7 +32,7 @@ var COMMAN_DICT = _objectSpread({
   "-r": "rebot"
 }, ENV_DICT);
 
-var DEFAULT_WORKERS = {
+var defaultWorkers = {
   env: "prod",
   robot: 1
 }; //获取部署配置
@@ -47,7 +47,7 @@ function getDeployConfig() {
     errorReporter(1007);
   }
 
-  DEFAULT_WORKERS = _objectSpread({}, DEFAULT_WORKERS, {}, deployConfig);
+  defaultWorkers = _objectSpread({}, defaultWorkers, {}, deployConfig);
   return deployConfig;
 } //处理传入args
 
@@ -65,7 +65,9 @@ function paramHandler() {
 function argvWorker(options) {
   var optionWatcher = null;
   var error = null;
-  var workers = DEFAULT_WORKERS;
+
+  var workers = _objectSpread({}, defaultWorkers);
+
   if (!options.length) return {
     error: error,
     workers: workers
@@ -109,7 +111,9 @@ function argvWorker(options) {
                   continue;
                 }
               }
-            } else workers.desc = (workers.desc || "") + " ".concat(meta);
+            } else {
+              if (workers.desc == defaultWorkers.desc) workers.desc = meta;else workers.desc = (workers.desc || "") + " ".concat(meta);
+            }
 
             break;
 
@@ -176,8 +180,10 @@ function argvWorker(options) {
 
   var env = (workers || {}).env;
   if (!(env in ENV_CONSTANT_PREFIX)) error = errorReporter(1003);
+  if (!workers.version) error = errorReporter(1008);
+  if (!workers.desc) error = errorReporter(1009);
   workers.desc = ENV_CONSTANT_PREFIX[env] + " ".concat(!!workers.desc ? workers.desc : "");
-  console.log(workers);
+  console.log(workers.desc);
   return {
     error: error,
     workers: workers

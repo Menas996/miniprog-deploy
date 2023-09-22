@@ -17,7 +17,7 @@ const COMMAN_DICT = {
     ...ENV_DICT,
 };
 
-let DEFAULT_WORKERS = {
+let defaultWorkers = {
     env: "prod",
     robot: 1,
 };
@@ -32,8 +32,8 @@ function getDeployConfig() {
         errorReporter(1007);
     }
 
-    DEFAULT_WORKERS = {
-        ...DEFAULT_WORKERS,
+    defaultWorkers = {
+        ...defaultWorkers,
         ...deployConfig,
     };
     return deployConfig;
@@ -49,7 +49,7 @@ function paramHandler() {
 function argvWorker(options) {
     let optionWatcher = null;
     let error = null;
-    const workers = DEFAULT_WORKERS;
+    const workers = {...defaultWorkers};
     if (!options.length) return { error, workers };
     for (let meta of options) {
         if (optionWatcher != null) {
@@ -77,7 +77,10 @@ function argvWorker(options) {
                                 continue;
                             }
                         }
-                    } else workers.desc = (workers.desc || "") + ` ${meta}`;
+                    } else {
+                      if(workers.desc == defaultWorkers.desc) workers.desc = meta;
+                      else workers.desc = (workers.desc || "") + ` ${meta}`;
+                    }
                     break;
 
                 /*机器人*/
@@ -114,8 +117,10 @@ function argvWorker(options) {
     //根据环境更改注释
     const env = (workers || {}).env;
     if (!(env in ENV_CONSTANT_PREFIX)) error = errorReporter(1003);
+    if(!workers.version) error = errorReporter(1008);
+    if(!workers.desc) error = errorReporter(1009);
     workers.desc = ENV_CONSTANT_PREFIX[env] + ` ${!!workers.desc ? workers.desc : ""}`;
-    console.log(workers);
+    console.log(workers.desc);
     return { error, workers };
 }
 
