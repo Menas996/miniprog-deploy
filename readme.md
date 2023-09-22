@@ -2,8 +2,8 @@
 
 ```ts
 module.exports = {
-   appId:"xxxxxx", //小程序项目appid (必填)
-   env:"production", //项目环境，默认为production，可选dev，test
+   appid:"xxxxxx", //小程序项目appid (必填)
+   env:"production", //项目环境，默认为prod，可选dev，test
    projectPath:"", //项目主目录
    version:"1.0.0", //项目版本
    desc:"bug fixed", //项目更新描述
@@ -14,7 +14,7 @@ module.exports = {
 type CustomConfig = {
    /*@custom*/
    privateKeyPath:string, //私有密钥
-   appId:string, 
+   appid:string, 
    baseUrl:string, //前缀
    qiniuRegion:string, //七牛云空间区域
    webviewBaseUrl:string, //webview空间

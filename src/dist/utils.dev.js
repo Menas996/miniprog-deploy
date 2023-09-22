@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 "use strict";
 
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
@@ -7,15 +6,24 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-function _readOnlyError(name) { throw new Error("\"" + name + "\" is read-only"); }
-
 var path = require("path");
 
 var rootpath = path.resolve(process.cwd(), "./deploy.config.js");
+
+var _require = require("./error"),
+    errorReporter = _require.errorReporter;
+
+var _require2 = require("./pattern"),
+    VERSION_PATTERN = _require2.VERSION_PATTERN,
+    ROBOT_PATTERN = _require2.ROBOT_PATTERN;
+
+var _require3 = require("./constant"),
+    ENV_CONSTANT_PREFIX = _require3.ENV_CONSTANT_PREFIX;
+
 var ENV_DICT = {
-  "-dev": "development",
+  "-dev": "dev",
   "-test": "test",
-  "-prod": "production"
+  "-prod": "prod"
 };
 
 var COMMAN_DICT = _objectSpread({
@@ -25,8 +33,7 @@ var COMMAN_DICT = _objectSpread({
 }, ENV_DICT);
 
 var DEFAULT_WORKERS = {
-  env: "production",
-  desc: "bug fixed",
+  env: "prod",
   robot: 1
 }; //获取部署配置
 
@@ -36,11 +43,11 @@ function getDeployConfig() {
   try {
     deployConfig = require(rootpath);
   } catch (e) {
+    console.log(e);
     errorReporter(1007);
   }
 
-  ;
-  DEFAULT_WORKERS = (_readOnlyError("DEFAULT_WORKERS"), _objectSpread({}, DEFAULT_WORKERS, {}, deployConfig));
+  DEFAULT_WORKERS = _objectSpread({}, DEFAULT_WORKERS, {}, deployConfig);
   return deployConfig;
 } //处理传入args
 
@@ -89,6 +96,7 @@ function argvWorker(options) {
 
           case "-m":
             if (meta in COMMAN_DICT) {
+              //如果没有描述内容报错
               if (!workers.desc) {
                 error = errorReporter(1002);
                 return {
@@ -96,10 +104,12 @@ function argvWorker(options) {
                   workers: workers
                 };
               } else {
-                optionWatcher = meta;
-                continue;
+                if (meta in ENV_DICT) workers.env = ENV_DICT[meta];else {
+                  optionWatcher = meta;
+                  continue;
+                }
               }
-            } else workers.desc += " ".concat(meta);
+            } else workers.desc = (workers.desc || "") + " ".concat(meta);
 
             break;
 
@@ -147,7 +157,8 @@ function argvWorker(options) {
             };
         }
       }
-    }
+    } //根据环境更改注释
+
   } catch (err) {
     _didIteratorError = true;
     _iteratorError = err;
@@ -163,6 +174,10 @@ function argvWorker(options) {
     }
   }
 
+  var env = (workers || {}).env;
+  if (!(env in ENV_CONSTANT_PREFIX)) error = errorReporter(1003);
+  workers.desc = ENV_CONSTANT_PREFIX[env] + " ".concat(!!workers.desc ? workers.desc : "");
+  console.log(workers);
   return {
     error: error,
     workers: workers

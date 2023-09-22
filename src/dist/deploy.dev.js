@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 "use strict";
 
 var ci = require("miniprogram-ci");

@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+ 
 const ci = require("miniprogram-ci");
 const { paramHandler,getDeployConfig } = require("./utils");
 
