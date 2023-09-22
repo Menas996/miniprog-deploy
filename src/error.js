@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const ERRORCODE_DICT = {
     1001:INVALID_VERSION, //无效版本
     1002:INVALID_DESC, //无效描述

@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const path = require("path");
 const rootpath = path.resolve(process.cwd(),"./deploy.config.js");
 

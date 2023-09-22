@@ -2,7 +2,7 @@
 const ci = require("miniprogram-ci");
 const { paramHandler,getDeployConfig } = require("./utils");
 
-(async () => {
+const mainThread = async () => {
     const deployConfig = getDeployConfig();
     if(deployConfig == null) return;
     const workers = paramHandler();
@@ -37,4 +37,8 @@ const { paramHandler,getDeployConfig } = require("./utils");
         onProgressUpdate: console.log
     })
     console.log(uploadResult);
-})()
+}
+
+module.exports = {
+    mainThread
+}
