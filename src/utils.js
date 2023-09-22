@@ -3,6 +3,7 @@ const rootpath = path.resolve(process.cwd(), "./deploy.config.js");
 const { errorReporter } = require("./error");
 const { VERSION_PATTERN, ROBOT_PATTERN } = require("./pattern");
 const { ENV_CONSTANT_PREFIX } = require("./constant");
+const fs = require("fs");
 
 const ENV_DICT = {
     "-dev": "dev",
@@ -13,7 +14,7 @@ const ENV_DICT = {
 const COMMAN_DICT = {
     "-v": "version",
     "-m": "desc",
-    "-r": "rebot",
+    "-r": "robot",
     ...ENV_DICT,
 };
 
@@ -21,6 +22,19 @@ let defaultWorkers = {
     env: "prod",
     robot: 1,
 };
+
+//向外部暴露workers，返回一个销毁函数
+function mkRuntimeFile(workers){
+   const { runtimePath } = workers; 
+   if(!runtimePath) return;
+   const runtimeAbsolutePath = path.resolve(process.cwd(),runtimePath);
+   fs.writeFileSync(`${runtimeAbsolutePath}/deploy.runtime.js`,"module.exports = "+ JSON.stringify(workers));
+   console.log(JSON.stringify(workers));
+   return function rmRuntimeFile(){
+    fs.rmSync(`${runtimeAbsolutePath}/deploy.runtime.js`);
+   }
+}
+
 
 //获取部署配置
 function getDeployConfig() {
@@ -49,7 +63,7 @@ function paramHandler() {
 function argvWorker(options) {
     let optionWatcher = null;
     let error = null;
-    const workers = {...defaultWorkers};
+    const workers = { ...defaultWorkers };
     if (!options.length) return { error, workers };
     for (let meta of options) {
         if (optionWatcher != null) {
@@ -127,4 +141,5 @@ function argvWorker(options) {
 module.exports = {
     paramHandler,
     getDeployConfig,
+    mkRuntimeFile 
 };

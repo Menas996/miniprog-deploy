@@ -1,6 +1,6 @@
 {
   "name": "miniprog-deploy",
-  "version": "0.1.6c",
+  "version": "0.1.6h",
   "description": "a miniprogram auto-deploy tool",
   "main": "main.js",
   "scripts": {

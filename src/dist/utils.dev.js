@@ -20,6 +20,8 @@ var _require2 = require("./pattern"),
 var _require3 = require("./constant"),
     ENV_CONSTANT_PREFIX = _require3.ENV_CONSTANT_PREFIX;
 
+var fs = require("fs");
+
 var ENV_DICT = {
   "-dev": "dev",
   "-test": "test",
@@ -29,13 +31,25 @@ var ENV_DICT = {
 var COMMAN_DICT = _objectSpread({
   "-v": "version",
   "-m": "desc",
-  "-r": "rebot"
+  "-r": "robot"
 }, ENV_DICT);
 
 var defaultWorkers = {
   env: "prod",
   robot: 1
-}; //获取部署配置
+}; //向外部暴露workers，返回一个销毁函数
+
+function mkRuntimeFile(workers) {
+  var runtimePath = workers.runtimePath;
+  if (!runtimePath) return;
+  var runtimeAbsolutePath = path.resolve(process.cwd(), runtimePath);
+  fs.writeFileSync("".concat(runtimeAbsolutePath, "/deploy.runtime.js"), "module.exports = " + JSON.stringify(workers));
+  console.log(JSON.stringify(workers));
+  return function rmRuntimeFile() {
+    fs.rmSync("".concat(runtimeAbsolutePath, "/deploy.runtime.js"));
+  };
+} //获取部署配置
+
 
 function getDeployConfig() {
   var deployConfig = null;
@@ -192,5 +206,6 @@ function argvWorker(options) {
 
 module.exports = {
   paramHandler: paramHandler,
-  getDeployConfig: getDeployConfig
+  getDeployConfig: getDeployConfig,
+  mkRuntimeFile: mkRuntimeFile
 };

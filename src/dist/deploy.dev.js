@@ -4,10 +4,11 @@ var ci = require("miniprogram-ci");
 
 var _require = require("./utils"),
     paramHandler = _require.paramHandler,
-    getDeployConfig = _require.getDeployConfig;
+    getDeployConfig = _require.getDeployConfig,
+    mkRuntimeFile = _require.mkRuntimeFile;
 
 var mainThread = function mainThread() {
-  var deployConfig, workers, version, desc, robot, appid, privateKeyPath, projectPath, project, uploadResult;
+  var deployConfig, workers, rmRuntimeFile, version, desc, robot, appid, privateKeyPath, projectPath, project, uploadResult;
   return regeneratorRuntime.async(function mainThread$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
@@ -32,15 +33,17 @@ var mainThread = function mainThread() {
           return _context.abrupt("return");
 
         case 6:
+          rmRuntimeFile = mkRuntimeFile(workers);
           version = workers.version, desc = workers.desc, robot = workers.robot, appid = workers.appid, privateKeyPath = workers.privateKeyPath, projectPath = workers.projectPath;
+          _context.prev = 8;
           project = new ci.Project({
             appid: appid,
             privateKeyPath: privateKeyPath,
             projectPath: projectPath,
-            type: 'miniProgram',
-            ignores: ['node_modules/**/*']
+            type: "miniProgram",
+            ignores: ["node_modules/**/*"]
           });
-          _context.next = 10;
+          _context.next = 12;
           return regeneratorRuntime.awrap(ci.upload({
             project: project,
             version: version,
@@ -56,16 +59,27 @@ var mainThread = function mainThread() {
             onProgressUpdate: console.log
           }));
 
-        case 10:
+        case 12:
           uploadResult = _context.sent;
           console.log(uploadResult);
+          _context.next = 18;
+          break;
 
-        case 12:
+        case 16:
+          _context.prev = 16;
+          _context.t0 = _context["catch"](8);
+
+        case 18:
+          _context.prev = 18;
+          rmRuntimeFile && rmRuntimeFile();
+          return _context.finish(18);
+
+        case 21:
         case "end":
           return _context.stop();
       }
     }
-  });
+  }, null, null, [[8, 16, 18, 21]]);
 };
 
 module.exports = {

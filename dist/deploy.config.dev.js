@@ -25,6 +25,7 @@ module.exports = _objectSpread({
   projectPath: "./",
   //项目主目录
   // version: "1.3.2", //项目版本
+  runtimePath: "./",
   desc: "bug fixed",
   //项目更新描述
   robot: 1
