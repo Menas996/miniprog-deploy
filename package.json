@@ -1,6 +1,6 @@
 {
   "name": "miniprog-deploy",
-  "version": "0.1.6h",
+  "version": "0.1.6p",
   "description": "a miniprogram auto-deploy tool",
   "main": "main.js",
   "scripts": {
@@ -16,7 +16,7 @@
     "miniprog-deploy": "./main.js"
   },
   "devDependencies": {
-    "eslint": "^8.49.0",
+    "eslint": "^8.50.0",
     "miniprogram-ci": "^1.9.8"
   }
 }

@@ -1,40 +1,41 @@
-const path = require("path");
-const rootpath = path.resolve(process.cwd(), "./deploy.config.js");
-const { errorReporter } = require("./error");
-const { VERSION_PATTERN, ROBOT_PATTERN } = require("./pattern");
-const { ENV_CONSTANT_PREFIX } = require("./constant");
-const fs = require("fs");
+const path = require('path');
+const fs = require('fs');
+const rootpath = path.resolve(process.cwd(), './deploy.config.js');
+const { errorReporter } = require('./error');
+const { VERSION_PATTERN, ROBOT_PATTERN } = require('./pattern');
+const { ENV_CONSTANT_PREFIX } = require('./constant');
 
 const ENV_DICT = {
-    "-dev": "dev",
-    "-test": "test",
-    "-prod": "prod",
+    '-dev': 'dev',
+    '-test': 'test',
+    '-prod': 'prod',
 };
 
 const COMMAN_DICT = {
-    "-v": "version",
-    "-m": "desc",
-    "-r": "robot",
+    '-v': 'version',
+    '-m': 'desc',
+    '-r': 'robot',
     ...ENV_DICT,
 };
 
 let defaultWorkers = {
-    env: "prod",
+    env: 'prod',
     robot: 1,
 };
 
-//向外部暴露workers，返回一个销毁函数
-function mkRuntimeFile(workers){
-   const { runtimePath } = workers; 
-   if(!runtimePath) return;
-   const runtimeAbsolutePath = path.resolve(process.cwd(),runtimePath);
-   fs.writeFileSync(`${runtimeAbsolutePath}/deploy.runtime.js`,"module.exports = "+ JSON.stringify(workers));
-   console.log(JSON.stringify(workers));
-   return function rmRuntimeFile(){
-    fs.rmSync(`${runtimeAbsolutePath}/deploy.runtime.js`);
-   }
-}
+let runtimeAbsolutePath;
 
+//向外部暴露workers，返回一个销毁函数
+function mkRuntimeFile(workers) {
+    const { runtimePath } = workers;
+    if (!runtimePath) return;
+    runtimeAbsolutePath = path.resolve(process.cwd(), `${runtimePath}/deploy.runtime.js`);
+    fs.writeFileSync(runtimeAbsolutePath, 'module.exports = ' + JSON.stringify(workers));
+    console.log(JSON.stringify(workers));
+    return function rmRuntimeFile() {
+        fs.rmSync(runtimeAbsolutePath);
+    };
+}
 
 //获取部署配置
 function getDeployConfig() {
@@ -69,7 +70,7 @@ function argvWorker(options) {
         if (optionWatcher != null) {
             switch (optionWatcher) {
                 /*版本*/
-                case "-v":
+                case '-v':
                     if (!VERSION_PATTERN.test(meta) || meta in COMMAN_DICT) {
                         error = errorReporter(1001);
                         return { error, workers };
@@ -77,8 +78,7 @@ function argvWorker(options) {
                     break;
 
                 /*描述*/
-                case "-m":
-
+                case '-m':
                     if (meta in COMMAN_DICT) {
                         //如果没有描述内容报错
                         if (!workers.desc) {
@@ -92,13 +92,13 @@ function argvWorker(options) {
                             }
                         }
                     } else {
-                      if(workers.desc == defaultWorkers.desc) workers.desc = meta;
-                      else workers.desc = (workers.desc || "") + ` ${meta}`;
+                        if (workers.desc == defaultWorkers.desc) workers.desc = meta;
+                        else workers.desc = (workers.desc || '') + ` ${meta}`;
                     }
                     break;
 
                 /*机器人*/
-                case "-r":
+                case '-r':
                     if (!ROBOT_PATTERN.test(meta) || meta in COMMAN_DICT) {
                         error = errorReporter(1005);
                         return { error, workers };
@@ -109,17 +109,17 @@ function argvWorker(options) {
                     error = errorReporter(1006);
                     return { error, workers };
             }
-            if (optionWatcher != "-m") optionWatcher = null;
+            if (optionWatcher != '-m') optionWatcher = null;
         } else {
             switch (meta) {
-                case "-v":
-                case "-m":
-                case "-r":
+                case '-v':
+                case '-m':
+                case '-r':
                     optionWatcher = meta;
                     break;
-                case "-dev":
-                case "-prod":
-                case "-test":
+                case '-dev':
+                case '-prod':
+                case '-test':
                     workers.env = ENV_DICT[meta];
                     break;
                 default:
@@ -131,9 +131,9 @@ function argvWorker(options) {
     //根据环境更改注释
     const env = (workers || {}).env;
     if (!(env in ENV_CONSTANT_PREFIX)) error = errorReporter(1003);
-    if(!workers.version) error = errorReporter(1008);
-    if(!workers.desc) error = errorReporter(1009);
-    workers.desc = ENV_CONSTANT_PREFIX[env] + ` ${!!workers.desc ? workers.desc : ""}`;
+    if (!workers.version) error = errorReporter(1008);
+    if (!workers.desc) error = errorReporter(1009);
+    workers.desc = ENV_CONSTANT_PREFIX[env] + ` ${!!workers.desc ? workers.desc : ''}`;
     console.log(workers.desc);
     return { error, workers };
 }
@@ -141,5 +141,6 @@ function argvWorker(options) {
 module.exports = {
     paramHandler,
     getDeployConfig,
-    mkRuntimeFile 
+    mkRuntimeFile,
+    runtimeAbsolutePath,
 };

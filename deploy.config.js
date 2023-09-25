@@ -1,4 +1,3 @@
-
 const CustomConfig = {
 	/*@custom*/
 	// privateKeyPath,

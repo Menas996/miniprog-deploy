@@ -6,47 +6,48 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-var path = require("path");
+var path = require('path');
 
-var rootpath = path.resolve(process.cwd(), "./deploy.config.js");
+var fs = require('fs');
 
-var _require = require("./error"),
+var rootpath = path.resolve(process.cwd(), './deploy.config.js');
+
+var _require = require('./error'),
     errorReporter = _require.errorReporter;
 
-var _require2 = require("./pattern"),
+var _require2 = require('./pattern'),
     VERSION_PATTERN = _require2.VERSION_PATTERN,
     ROBOT_PATTERN = _require2.ROBOT_PATTERN;
 
-var _require3 = require("./constant"),
+var _require3 = require('./constant'),
     ENV_CONSTANT_PREFIX = _require3.ENV_CONSTANT_PREFIX;
 
-var fs = require("fs");
-
 var ENV_DICT = {
-  "-dev": "dev",
-  "-test": "test",
-  "-prod": "prod"
+  '-dev': 'dev',
+  '-test': 'test',
+  '-prod': 'prod'
 };
 
 var COMMAN_DICT = _objectSpread({
-  "-v": "version",
-  "-m": "desc",
-  "-r": "robot"
+  '-v': 'version',
+  '-m': 'desc',
+  '-r': 'robot'
 }, ENV_DICT);
 
 var defaultWorkers = {
-  env: "prod",
+  env: 'prod',
   robot: 1
-}; //向外部暴露workers，返回一个销毁函数
+};
+var runtimeAbsolutePath; //向外部暴露workers，返回一个销毁函数
 
 function mkRuntimeFile(workers) {
   var runtimePath = workers.runtimePath;
   if (!runtimePath) return;
-  var runtimeAbsolutePath = path.resolve(process.cwd(), runtimePath);
-  fs.writeFileSync("".concat(runtimeAbsolutePath, "/deploy.runtime.js"), "module.exports = " + JSON.stringify(workers));
+  runtimeAbsolutePath = path.resolve(process.cwd(), "".concat(runtimePath, "/deploy.runtime.js"));
+  fs.writeFileSync(runtimeAbsolutePath, 'module.exports = ' + JSON.stringify(workers));
   console.log(JSON.stringify(workers));
   return function rmRuntimeFile() {
-    fs.rmSync("".concat(runtimeAbsolutePath, "/deploy.runtime.js"));
+    fs.rmSync(runtimeAbsolutePath);
   };
 } //获取部署配置
 
@@ -97,7 +98,7 @@ function argvWorker(options) {
       if (optionWatcher != null) {
         switch (optionWatcher) {
           /*版本*/
-          case "-v":
+          case '-v':
             if (!VERSION_PATTERN.test(meta) || meta in COMMAN_DICT) {
               error = errorReporter(1001);
               return {
@@ -110,7 +111,7 @@ function argvWorker(options) {
 
           /*描述*/
 
-          case "-m":
+          case '-m':
             if (meta in COMMAN_DICT) {
               //如果没有描述内容报错
               if (!workers.desc) {
@@ -126,14 +127,14 @@ function argvWorker(options) {
                 }
               }
             } else {
-              if (workers.desc == defaultWorkers.desc) workers.desc = meta;else workers.desc = (workers.desc || "") + " ".concat(meta);
+              if (workers.desc == defaultWorkers.desc) workers.desc = meta;else workers.desc = (workers.desc || '') + " ".concat(meta);
             }
 
             break;
 
           /*机器人*/
 
-          case "-r":
+          case '-r':
             if (!ROBOT_PATTERN.test(meta) || meta in COMMAN_DICT) {
               error = errorReporter(1005);
               return {
@@ -152,18 +153,18 @@ function argvWorker(options) {
             };
         }
 
-        if (optionWatcher != "-m") optionWatcher = null;
+        if (optionWatcher != '-m') optionWatcher = null;
       } else {
         switch (meta) {
-          case "-v":
-          case "-m":
-          case "-r":
+          case '-v':
+          case '-m':
+          case '-r':
             optionWatcher = meta;
             break;
 
-          case "-dev":
-          case "-prod":
-          case "-test":
+          case '-dev':
+          case '-prod':
+          case '-test':
             workers.env = ENV_DICT[meta];
             break;
 
@@ -196,7 +197,7 @@ function argvWorker(options) {
   if (!(env in ENV_CONSTANT_PREFIX)) error = errorReporter(1003);
   if (!workers.version) error = errorReporter(1008);
   if (!workers.desc) error = errorReporter(1009);
-  workers.desc = ENV_CONSTANT_PREFIX[env] + " ".concat(!!workers.desc ? workers.desc : "");
+  workers.desc = ENV_CONSTANT_PREFIX[env] + " ".concat(!!workers.desc ? workers.desc : '');
   console.log(workers.desc);
   return {
     error: error,
@@ -207,5 +208,6 @@ function argvWorker(options) {
 module.exports = {
   paramHandler: paramHandler,
   getDeployConfig: getDeployConfig,
-  mkRuntimeFile: mkRuntimeFile
+  mkRuntimeFile: mkRuntimeFile,
+  runtimeAbsolutePath: runtimeAbsolutePath
 };

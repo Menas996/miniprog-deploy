@@ -1,5 +1,5 @@
-const ci = require("miniprogram-ci");
-const { paramHandler, getDeployConfig, mkRuntimeFile } = require("./utils");
+const ci = require('miniprogram-ci');
+const { paramHandler, getDeployConfig, mkRuntimeFile } = require('./utils');
 
 const mainThread = async () => {
     const deployConfig = getDeployConfig();
@@ -13,8 +13,8 @@ const mainThread = async () => {
             appid,
             privateKeyPath,
             projectPath,
-            type: "miniProgram",
-            ignores: ["node_modules/**/*"],
+            type: 'miniProgram',
+            ignores: ['node_modules/**/*'],
         });
 
         const uploadResult = await ci.upload({

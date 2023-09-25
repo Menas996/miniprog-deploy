@@ -1,8 +1,8 @@
 "use strict";
 
-var ci = require("miniprogram-ci");
+var ci = require('miniprogram-ci');
 
-var _require = require("./utils"),
+var _require = require('./utils'),
     paramHandler = _require.paramHandler,
     getDeployConfig = _require.getDeployConfig,
     mkRuntimeFile = _require.mkRuntimeFile;
@@ -40,8 +40,8 @@ var mainThread = function mainThread() {
             appid: appid,
             privateKeyPath: privateKeyPath,
             projectPath: projectPath,
-            type: "miniProgram",
-            ignores: ["node_modules/**/*"]
+            type: 'miniProgram',
+            ignores: ['node_modules/**/*']
           });
           _context.next = 12;
           return regeneratorRuntime.awrap(ci.upload({
