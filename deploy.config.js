@@ -1,11 +1,11 @@
 const CustomConfig = {
 	/*@custom*/
 	// privateKeyPath,
-	// appId: string,
-	// baseUrl: string, //前缀
-	// qiniuRegion: string, //七牛云空间区域
-	// webviewBaseUrl: string, //webview空间
-	// defaultOrgId: string, //默认机构id
+	// appId: "string",
+	// baseUrl: "string", //前缀
+	// qiniuRegion: "string", //七牛云空间区域
+	// webviewBaseUrl: "string", //webview空间
+	// defaultOrgId: "string", //默认机构id
 	/*@custom end*/
 }
 

@@ -12,7 +12,7 @@ const ENV_DICT = {
 };
 
 const COMMAN_DICT = {
-    '-v': 'version',
+    '-V': 'version',
     '-m': 'desc',
     '-r': 'robot',
     ...ENV_DICT,
@@ -29,7 +29,7 @@ let runtimeAbsolutePath;
 function mkRuntimeFile(workers) {
     const { runtimePath } = workers;
     if (!runtimePath) return;
-    runtimeAbsolutePath = path.resolve(process.cwd(), `${runtimePath}/deploy.runtime.js`);
+    runtimeAbsolutePath = path.resolve(process.cwd(),runtimePath,'deploy.runtime.js');
     fs.writeFileSync(runtimeAbsolutePath, 'module.exports = ' + JSON.stringify(workers));
     console.log(JSON.stringify(workers));
     return function rmRuntimeFile() {
@@ -56,7 +56,7 @@ function getDeployConfig() {
 
 //处理传入args
 function paramHandler() {
-    const args = process.argv.slice(2);
+    const args = process.argv.slice(2); 
     const { error, workers } = argvWorker(args);
     return !error ? workers : null;
 }
@@ -67,10 +67,11 @@ function argvWorker(options) {
     const workers = { ...defaultWorkers };
     if (!options.length) return { error, workers };
     for (let meta of options) {
+        console.log(meta);
         if (optionWatcher != null) {
             switch (optionWatcher) {
                 /*版本*/
-                case '-v':
+                case '-V':
                     if (!VERSION_PATTERN.test(meta) || meta in COMMAN_DICT) {
                         error = errorReporter(1001);
                         return { error, workers };
@@ -85,8 +86,10 @@ function argvWorker(options) {
                             error = errorReporter(1002);
                             return { error, workers };
                         } else {
-                            if (meta in ENV_DICT) workers.env = ENV_DICT[meta];
-                            else {
+                            if (meta in ENV_DICT) {
+                                workers.env = ENV_DICT[meta];
+                                optionWatcher = null;
+                            } else {
                                 optionWatcher = meta;
                                 continue;
                             }
@@ -112,7 +115,7 @@ function argvWorker(options) {
             if (optionWatcher != '-m') optionWatcher = null;
         } else {
             switch (meta) {
-                case '-v':
+                case '-V':
                 case '-m':
                 case '-r':
                     optionWatcher = meta;

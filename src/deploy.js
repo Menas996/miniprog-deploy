@@ -7,6 +7,7 @@ const mainThread = async () => {
     const workers = paramHandler();
     if (workers == null) return;
     const rmRuntimeFile = mkRuntimeFile(workers);
+    //pause
     const { version, desc, robot, appid, privateKeyPath, projectPath } = workers;
     try {
         const project = new ci.Project({
@@ -38,6 +39,4 @@ const mainThread = async () => {
     }
 };
 
-module.exports = {
-    mainThread,
-};
+module.exports = { mainThread };
